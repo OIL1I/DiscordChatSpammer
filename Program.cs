@@ -23,7 +23,6 @@ namespace Keyboard
                         "\nexit -> closes the program" +
                         "\nautosend [0/1] -> disable/enables automatic sending" +
                         "\nautosendtime [x > 0] -> sets the time till the message gets send to the given value (hast to be greater 0)" +
-                        "\nsetkey [kX] -> sets the key to write (X is the name of the key e.g \'a\'" +
                         "\nsettext [text} -> sets the text to write"+
                         "\nsleep [x > 0] -> sets the time till the next character is written (hast to be greater 0)");
                 }
@@ -77,35 +76,24 @@ namespace Keyboard
                         }
                     }
                 }
-                else if (input[0].ToLower() == "setkey")
-                {
-                    if (input.Length < 2) continue;
-                    if (dw.SetKey(input[1].ToLower()))
-                    {
-                        Console.WriteLine("Changed key : {0}", input[1].ToLower());
-                    }
-                    else
-                    {
-                        Console.WriteLine("Could\'t change key");
-                    }
-                }
                 else if (input[0].ToLower() == "settext")
                 {
                     if (input.Length < 2) continue;
-                    if (input.Length == 2 && dw.SetText(input[1].ToLower()))
-                    {
-                        Console.WriteLine("Changed text to : {0}" , input[1].ToLower());
+                    string str = dw.WriterText;
+                    if (input.Length == 2 && dw.SetText(input[1]))
+                    {                        
+                        Console.WriteLine("Changed text from : {0} to : {1}" ,str, dw.WriterText);
                     }
                     else if (input.Length > 2)
                     {
                         string[] vs = new string[input.Length-1];
                         for (int i = 1; i < input.Length; i++)
                         {
-                            vs[i-1] = input[i].ToLower();
+                            vs[i-1] = input[i];
                         }
                         if (dw.SetTextWithSpaces(vs))
                         {
-                            Console.WriteLine("Succesfully changed text");
+                            Console.WriteLine("Changed textfrom : {0} to : {1}", str, dw.WriterText);
                         }
                         else
                         {

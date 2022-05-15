@@ -7,19 +7,20 @@ namespace Keyboard
 {
     public class DiscordWriter
     {
-        const UInt32 WN_KEYDOWN = 0x0100;
+        const UInt32 WM_CHAR = 0x0102;
+        const UInt32 WM_KEYDOWN = 0x0100;
         bool shouldRun;
         Thread writerThread;
 
         public int SleepTime { get; set; }
         public bool ShouldAutoSend { get; set; }
         public int AutoSendCount { get; set; }
-        int[] VKeys { get; set; }
+        public string WriterText { get; set; }
 
         public DiscordWriter()
         {
             SleepTime = 1;
-            VKeys = new int[] { 0x45 };
+            WriterText = "e";
             ShouldAutoSend = false;
             AutoSendCount = 100;
         }
@@ -35,41 +36,23 @@ namespace Keyboard
             shouldRun = false;
         }
 
-        public bool SetKey(string pKeyName)
-        {
-            int result = KeyCodes.GetValueByName(pKeyName);
-            if (result > 0)
-            {
-                VKeys = new int[] { result };
-                return true;
-            }
-            return false;
-        }
-
         public bool SetText(string pText)
         {
-            int[] result = KeyCodes.GetValuesFromText(pText);
-            if (result.Length > 0)
-            {
-                VKeys = result;
-                return true;
-            }
+            WriterText = pText;
+            if (WriterText.Length > 0) return true;
+            WriterText = "e";
             return false;
         }
 
         public bool SetTextWithSpaces(string[] pText)
         {
-            System.Collections.Generic.List<int> result = new System.Collections.Generic.List<int>();
+            WriterText = "";
             foreach (string str in pText)
             {
-                result.AddRange(KeyCodes.GetValuesFromText(str));
-                result.Add(((int)KeyCodes.KeyCode.kspace));
+                WriterText += str + " ";
             }
-            if (result.Count > 0)
-            {
-                VKeys = result.ToArray();
-                return true;
-            }
+            if (WriterText.Length > 0) return true;
+            WriterText = "e";
             return false;
         }
 
@@ -87,10 +70,10 @@ namespace Keyboard
                     Process[] processes = Process.GetProcessesByName("Discord");
                     foreach (Process proc in processes)
                     {
-                       foreach (int VK in VKeys)
-                       {
-                           PostMessage(proc.MainWindowHandle, WN_KEYDOWN, VK, 0);
-                       }
+                        foreach (char c in WriterText)
+                        {
+                            PostMessage(proc.MainWindowHandle, WM_CHAR, c, 0);
+                        }
                     }
                     Thread.Sleep(SleepTime);
                     loopCount++;
@@ -101,7 +84,7 @@ namespace Keyboard
                     Process[] processes = Process.GetProcessesByName("Discord");
                     foreach (Process proc in processes)
                     {
-                        PostMessage(proc.MainWindowHandle, WN_KEYDOWN, 0x0D, 0); // 0x0D => Enter-Key
+                        PostMessage(proc.MainWindowHandle, WM_KEYDOWN, 0x0D, 0); // 0x0D => Enter-Key
                     }
                     Thread.Sleep(SleepTime);
                 }
