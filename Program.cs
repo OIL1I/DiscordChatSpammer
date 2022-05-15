@@ -10,6 +10,10 @@ namespace Keyboard
         static void Main()
         {
             DiscordWriter dw = new DiscordWriter();
+
+            Console.WriteLine("Welcome to the Discord chat spammer !");
+            Console.WriteLine("type \"help\" for a list of commands");
+
             while (true)
             {
                 String[] input = Console.ReadLine().Split(' ');
